@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 from AgentIBR import AgentIBR
+from Joueur import Joueur
 from Utils import *
 
 playerChoices = [3,3,3]
@@ -19,23 +20,20 @@ if __name__ == '__main__':
 
     Values, Positions = ConvertFileToArray(file)
 
-    for x in range(len(playerChoices)):
-        players.append(AgentIBR(x, playerChoices, Values))
+    players = createPlayers(AgentIBR, playerChoices, Values)
 
-    currentChoice = [1,2,3]
-    tempChoice = []
-    for x in range(5):
-        for player in players:
-            tempChoice.append(player.getNextChoice(currentChoice.copy()))
-        print("this is the choice after the : {0}".format(x))
-        print(tempChoice)
-        print("\n\n\n")
-        i=0
-        for player in players:
-            player.setCurrentOutcome(float(Values[getAbosolutePosition(tempChoice, playerChoices)][i]))
-            i+=1
-        currentChoice = tempChoice
-        tempChoice = []
+    #choose a random choice for each player
+    currentChoice = []
+    for player in players:
+        currentChoice.append(player.chooseStartingPoint())
+
+
+    print(currentChoice)
+
+    for step in range(5):
+        currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
+
+
 
 
 

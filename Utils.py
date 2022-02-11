@@ -1,3 +1,6 @@
+import math
+import random
+
 def ConvertFileToArray(file):
     Values = []
     Positions = []
@@ -22,3 +25,28 @@ def getAbosolutePosition(arrayOfChoices, choicesPerPlayer):
         combinedChoices *= choicesPerPlayer[i]
         i+=1
     return sum
+
+def createPlayers(classOfPlayer, playerChoices, Values):
+    players = []
+    for x in range(len(playerChoices)):
+        players.append(classOfPlayer(x, playerChoices, Values))
+    return players
+
+def randomChoice(playerChoices):
+    choice = []
+    for x in playerChoices:
+        choice.append(random.randint(1,x))
+    return choice
+
+def iteration(players, currentChoice, Values, playerChoices, step):
+    tempChoice = []
+    for player in players:
+        tempChoice.append(player.getNextChoice(currentChoice.copy()))
+    print("this is the choice after the : {0}".format(step))
+    print(tempChoice)
+    print("\n")
+    i = 0
+    for player in players:
+        player.setCurrentOutcome(float(Values[getAbosolutePosition(tempChoice, playerChoices)][i]))
+        i += 1
+    return tempChoice
