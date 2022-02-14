@@ -6,6 +6,7 @@ from datetime import datetime
 from AgentIBR import AgentIBR
 from Joueur import Joueur
 from Utils import *
+from minmax import getAllPayoffForPlay
 
 
 def iteration(players, currentChoice, Values, playerChoices, step):
@@ -72,6 +73,8 @@ if __name__ == '__main__':
     file = open("games/{0}.game".format(filename), "r")
 
     Values, Positions = ConvertFileToArray(file)
+
+    getAllPayoffForPlay(Values, 0, playerChoices, 1)
 
     players = createPlayers(AgentIBR, playerChoices, Values)
 
