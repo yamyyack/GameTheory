@@ -1,6 +1,7 @@
 from Utils import *
 from Joueur import Joueur
 from abc import ABC
+from IterativeChoice import *
 
 class AgentIBR(Joueur):
 
@@ -15,21 +16,8 @@ class AgentIBR(Joueur):
 
     #overriding abstract mrthod
     def getNextChoice(self, arrayCurrentChoice):
-        #sets the current temp to be equal to the original choice
-        #so unless theres something larger it will choose the same one
-        tempCurrent = float(self.Values[getAbosolutePosition(arrayCurrentChoice, self.numberOfChoices)][self.playerNumber])
-        tempPosition = arrayCurrentChoice[self.playerNumber]
+        return IBR(self.playerNumber, self.numberOfChoices, arrayCurrentChoice, self.Values)
 
-        #loops through every choice this player can make
-        for x in range(1, self.numberOfChoices[self.playerNumber]+1):
-            arrayCurrentChoice[self.playerNumber] = x
-
-            #if the choice is larger than the current choice change
-            if (float(self.Values[getAbosolutePosition(arrayCurrentChoice, self.numberOfChoices)][self.playerNumber]) > tempCurrent):
-                tempCurrent = float(self.Values[getAbosolutePosition(arrayCurrentChoice, self.numberOfChoices)][self.playerNumber])
-                tempPosition = x
-
-        return tempPosition
 
     def setCurrentOutcome(self, outcome):
         self.currentOutcome = outcome

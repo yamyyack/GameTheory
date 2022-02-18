@@ -88,15 +88,3 @@ if __name__ == '__main__':
 
     for step in range(5):
         currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
-
-
-
-
-
-
-
-
-
-
-
-
