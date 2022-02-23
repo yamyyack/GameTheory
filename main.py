@@ -3,29 +3,29 @@ import os
 import json
 from datetime import datetime
 
-from AgentIBR import AgentIBR
 from Joueur import Joueur
 from Utils import *
-from minmax import getAllPayoffForPlay
+from FirstChoice import getAllPayoffForPlay
+from IterativeChoice import *
 
 
 def iteration(players, currentChoice, Values, playerChoices, step):
     tempChoice = []
     for player in players:
         tempChoice.append(player.getNextChoice(currentChoice.copy()))
-    print("this is the choice after the : {0}".format(step))
+    print("this is the choice after the : {0}".format(step+1))
     print(tempChoice)
-    print("\n")
+    print("")
     i = 0
     for player in players:
         player.setCurrentOutcome(float(Values[getAbosolutePosition(tempChoice, playerChoices)][i]))
         i += 1
     return tempChoice
 
-def createPlayers(classOfPlayer, playerChoices, Values):
+def createPlayers(playerChoices, Values, iterationMethod):
     players = []
     for x in range(len(playerChoices)):
-        players.append(classOfPlayer(x, playerChoices, Values))
+        players.append(Joueur(x, playerChoices, Values, iterationMethod))
     return players
 
 def ConvertFileToArray(file):
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     getAllPayoffForPlay(Values, 0, playerChoices, 1)
 
-    players = createPlayers(AgentIBR, playerChoices, Values)
+    players = createPlayers(playerChoices, Values, IBR)
 
     #choose a random choice for each player
     currentChoice = []
@@ -88,3 +88,6 @@ if __name__ == '__main__':
 
     for step in range(5):
         currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
+
+    for player in players:
+        print(player.toString())

@@ -1,5 +1,5 @@
 {
-	"number of choices per player":[3,5,4], 
+	"number of choices per player":[2,2], 
 	"min payoff":0, 
 	"max payoff":10,
 	"int payoff":true,
