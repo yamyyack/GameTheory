@@ -7,6 +7,7 @@ from Joueur import Joueur
 from Utils import *
 from FirstChoice import getAllPayoffForPlay
 from IterativeChoice import *
+from FirstChoice import *
 
 
 def iteration(players, currentChoice, Values, playerChoices, step):
@@ -24,8 +25,8 @@ def iteration(players, currentChoice, Values, playerChoices, step):
 
 def createPlayers(playerChoices, Values, iterationMethod):
     players = []
-    for x in range(len(playerChoices)):
-        players.append(Joueur(x, playerChoices, Values, iterationMethod))
+    for x in range(1,len(playerChoices)+1):
+        players.append(Joueur(x, playerChoices, Values, iterationMethod, minmax))
     return players
 
 def ConvertFileToArray(file):
@@ -74,8 +75,6 @@ if __name__ == '__main__':
 
     Values, Positions = ConvertFileToArray(file)
 
-    getAllPayoffForPlay(Values, 0, playerChoices, 1)
-
     players = createPlayers(playerChoices, Values, IBR)
 
     #choose a random choice for each player
@@ -89,5 +88,9 @@ if __name__ == '__main__':
     for step in range(5):
         currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
 
+    f = open("outcome/{0}.txt".format(filename), "x")
+    f = open("outcome/{0}.txt".format(filename), "a")
     for player in players:
-        print(player.toString())
+        print(player.behaviorToString())
+        f.write(player.behaviorToString())
+

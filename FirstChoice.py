@@ -2,6 +2,7 @@ from Utils import getAbosolutePosition
 
 
 def minmax(playerChoices, Values, currentPlayer):
+    currentPlayer -= 1
     randarray = [9999999999]*(playerChoices[currentPlayer])
     for x in range(playerChoices[currentPlayer]):
         kek = getAllPayoffForPlay(Values, currentPlayer, playerChoices, x+1)
