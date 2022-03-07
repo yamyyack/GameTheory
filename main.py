@@ -9,6 +9,21 @@ from FirstChoice import getAllPayoffForPlay
 from IterativeChoice import *
 from FirstChoice import *
 
+anarchyValue = 0
+anarchyValuePos = []
+
+def setAnarchyValue(Values, Positions):
+    global anarchyValue
+    global anarchyValuePos
+    for index, results in enumerate(Values):
+        sum = 0
+        for x in results:
+            sum += int(x)
+        if sum > anarchyValue:
+            anarchyValuePos = []
+            anarchyValue = sum
+        if sum == anarchyValue:
+            anarchyValuePos.append(Positions[index])
 
 def iteration(players, currentChoice, Values, playerChoices, step):
     tempChoice = []
@@ -75,6 +90,7 @@ if __name__ == '__main__':
 
     Values, Positions = ConvertFileToArray(file)
 
+    setAnarchyValue(Values, Positions)
     players = createPlayers(playerChoices, Values, IBR)
 
     #choose a random choice for each player
@@ -90,7 +106,12 @@ if __name__ == '__main__':
 
     f = open("outcome/{0}.txt".format(filename), "x")
     f = open("outcome/{0}.txt".format(filename), "a")
+    playersum = 0
     for player in players:
+        playersum += player.currentOutcome
         print(player.behaviorToString())
         f.write(player.behaviorToString())
-
+    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
+    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
+    print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+    f.write("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
