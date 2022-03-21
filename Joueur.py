@@ -36,6 +36,9 @@ class Joueur():
         self.iterationCount +=1
         self.averageOutcome += (outcome - self.averageOutcome)/self.iterationCount
 
+    def updateValues(self, Values):
+        self.Values = Values
+
 
     def toString(self):
         return "player number {0} had a max value of {1}, and a min value of {2} and the average of {3}\nthey are currently " \

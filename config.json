@@ -1,7 +1,7 @@
 {
 	"number of choices per player":[3,3,3], 
 	"min payoff":0, 
-	"max payoff":5,
+	"max payoff":10,
 	"int payoff":true,
 	"int payoff multiplier" : 1
 }

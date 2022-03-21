@@ -53,8 +53,8 @@ def ConvertFileToArray(file):
             array = line.split(":")
             position = array[0][1:-2]
             value = array[1][3:-3]
-            positionToArray = position.split("  ")
-            valueToArray = value.split(" ")
+            positionToArray = [float(posiiton) for posiiton in position.split("  ")]
+            valueToArray = [float(tempValue) for tempValue in value.split(" ")]
             Positions.append(positionToArray)
             Values.append(valueToArray)
     return Values, Positions
@@ -115,3 +115,55 @@ if __name__ == '__main__':
     print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
     print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
     f.write("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+
+    originalsum = playersum
+
+    #todo
+    #normalize all the rezults in relation to the final choice
+    #re itterate
+
+    #normalize
+
+    baseline = Values[getAbosolutePosition(currentChoice, playerChoices)]
+
+    temp = []
+    for x in baseline:
+        temp.append(int(x)/playersum)
+
+    baseline = temp
+
+    newValues = []
+    for x in Values:
+        linesum = 0
+        for i in x:
+            linesum += int(i)
+        temp = []
+        for y,z in enumerate(x):
+            temp.append(linesum * baseline[y])
+
+        newValues.append(temp)
+
+    Values = newValues
+    for player in players:
+        player.updateValues(Values)
+
+    #reiterate
+    currentChoice = []
+    for player in players:
+        currentChoice.append(player.chooseStartingPoint())
+
+    for step in range(10):
+        currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
+
+    f.write("\n\nonce normalization is done : \n")
+    playersum = 0
+    for player in players:
+        playersum += player.currentOutcome
+        print(player.behaviorToString())
+        f.write(player.behaviorToString())
+    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
+    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
+    print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+    f.write("Following choices will give the Anarchy value : {0}\n".format(anarchyValuePos))
+    print("changes from {0} to {1}".format(originalsum, playersum))
+    f.write("changes from {0} to {1}\n".format(originalsum, playersum))
