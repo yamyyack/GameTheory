@@ -7,7 +7,7 @@ def minmax(playerChoices, Values, currentPlayer):
     for x in range(playerChoices[currentPlayer]):
         kek = getAllPayoffForPlay(Values, currentPlayer, playerChoices, x+1)
         for y in kek:
-            if(int(y[currentPlayer]) < int(randarray[x])):
+            if((y[currentPlayer]) < (randarray[x])):
                 randarray[x] = y[currentPlayer]
 
     max_value = max(randarray)
