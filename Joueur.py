@@ -38,7 +38,7 @@ class Joueur():
 
 
     def toString(self):
-        return "player number {0} had a max value of {1}, and a min value of {2} and the average of {3}\nthey are currently " \
+        return  "player number {0} had a max value of {1}, and a min value of {2} and the average of {3}\nthey are currently " \
         "sitting at {4}".format(
             self.playerNumber, self.maxOutcome, self.minOutcome, self.averageOutcome, self.currentOutcome)
 

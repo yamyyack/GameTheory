@@ -9,21 +9,21 @@ from FirstChoice import getAllPayoffForPlay
 from IterativeChoice import *
 from FirstChoice import *
 
-anarchyValue = 0
-anarchyValuePos = []
+anarchyCost = 0
+anarchyCostPos = []
 
-def setAnarchyValue(Values, Positions):
-    global anarchyValue
-    global anarchyValuePos
+def setanarchyCost(Values, Positions):
+    global anarchyCost
+    global anarchyCostPos
     for index, results in enumerate(Values):
         sum = 0
         for x in results:
             sum += int(x)
-        if sum > anarchyValue:
-            anarchyValuePos = []
-            anarchyValue = sum
-        if sum == anarchyValue:
-            anarchyValuePos.append(Positions[index])
+        if sum > anarchyCost:
+            anarchyCostPos = []
+            anarchyCost = sum
+        if sum == anarchyCost:
+            anarchyCostPos.append(Positions[index])
 
 def iteration(players, currentChoice, Values, playerChoices, step):
     tempChoice = []
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     Values, Positions = ConvertFileToArray(file)
 
-    setAnarchyValue(Values, Positions)
+    setanarchyCost(Values, Positions)
     players = createPlayers(playerChoices, Values, IBR)
 
     #choose a random choice for each player
@@ -111,7 +111,7 @@ if __name__ == '__main__':
         playersum += player.currentOutcome
         print(player.behaviorToString())
         f.write(player.behaviorToString())
-    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
-    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
-    print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
-    f.write("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyCost)))
+    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyCost)))
+    print("Following choices will give the Anarchy value : {0}".format(anarchyCostPos))
+    f.write("Following choices will give the Anarchy value : {0}".format(anarchyCostPos))
