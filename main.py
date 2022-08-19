@@ -1,6 +1,7 @@
 import math
 import os
 import json
+import time
 from datetime import datetime
 
 from Joueur import Joueur
@@ -8,6 +9,7 @@ from Utils import *
 from FirstChoice import getAllPayoffForPlay
 from IterativeChoice import *
 from FirstChoice import *
+from MAB import *
 
 anarchyValue = 0
 anarchyValuePos = []
@@ -15,6 +17,8 @@ anarchyValuePos = []
 def setAnarchyValue(Values, Positions):
     global anarchyValue
     global anarchyValuePos
+    anarchyValuePos = []
+    anarchyValue = 0
     for index, results in enumerate(Values):
         sum = 0
         for x in results:
@@ -38,10 +42,63 @@ def iteration(players, currentChoice, Values, playerChoices, step):
         i += 1
     return tempChoice
 
-def createPlayers(playerChoices, Values, iterationMethod):
+def createPlayers(playerChoices, Values, playerinfo):
+
     players = []
-    for x in range(1,len(playerChoices)+1):
-        players.append(Joueur(x, playerChoices, Values, iterationMethod, minmax))
+    for x in playerinfo:
+        infoDict = {}
+        if(x['starting method'] == "minmax"):
+            StartingMethod = minmax
+            if "tableValue" not in infoDict:
+                infoDict.update({"tableValue" : Values})
+                infoDict.update({"number of choices": playerChoices})
+                infoDict.update({"player number": x['player number']})
+        elif (x['starting method'] == "MAB"):
+            StartingMethod = MAB
+            if "MAB number of total plays" not in infoDict:
+                infoDict.update({"MAB number of total plays": 0})
+
+
+                infoDict.update({"number of choices": (playerChoices[x['player number']-1])})
+
+                temparray = [0]*(playerChoices[x['player number']-1])
+                infoDict.update({"number of selection": temparray})
+
+                infoDict.update({"selection" : -1})
+
+                temparray = [[]] * (playerChoices[x['player number']-1])
+                infoDict.update({"list of value": temparray})
+
+                infoDict.update({"max possible value": 10})
+
+        if(x['iteration method'] == "IBR"):
+            iterationMethod = IBR
+            if "tableValue" not in infoDict:
+                infoDict.update({"tableValue" : Values})
+                infoDict.update({"number of choices": playerChoices})
+                infoDict.update({"player number": x['player number']})
+                infoDict.update({"array Current Choice" : -1})
+
+        elif (x['iteration method'] == "MAB"):
+            iterationMethod = MAB
+            if "MAB number of total plays" not in infoDict:
+                infoDict.update({"MAB number of total plays": 0})
+
+                infoDict.update({"number of choices": (playerChoices[x['player number']-1])})
+
+                temparray = [0]*(playerChoices[x['player number']]-1)
+                infoDict.update({"number of selection": temparray})
+
+                infoDict.update({"selection" : -1})
+
+                temparray = [[]] * (playerChoices[x['player number']] - 1)
+                infoDict.update({"list of value": temparray})
+
+                infoDict.update({"max possible value": 10})
+
+
+
+        players.append(Joueur(x["player number"], playerChoices, infoDict, iterationMethod, StartingMethod))
     return players
 
 def ConvertFileToArray(file):
@@ -66,104 +123,143 @@ def loadJsonFile():
     f = open('config.json')
     data = json.load(f)
 
-    configSettings += " -players " + str(len(data['number of choices per player'])) + " -actions "
-    for x in data['number of choices per player']:
-        configSettings += str(x) + " "
-    configSettings += " -min_payoff " + str(data['min payoff']) + " -max_payoff " + str(data['max payoff'])
-    if data['int payoff'] == True:
-        configSettings += " -int_payoffs -int_mult " + str(data['int payoff multiplier'])
+    GameInfo = data["game info"]
+    PlayerInfo = data['player info']
 
-    playerChoices = data['number of choices per player']
+    configSettings += " -players " + str(len(GameInfo['number of choices per player'])) + " -actions "
+    for x in GameInfo['number of choices per player']:
+        configSettings += str(x) + " "
+    configSettings += " -min_payoff " + str(GameInfo['min payoff']) + " -max_payoff " + str(GameInfo['max payoff'])
+    if GameInfo['int payoff'] == True:
+        configSettings += " -int_payoffs -int_mult " + str(GameInfo['int payoff multiplier'])
+
+    playerChoices = GameInfo['number of choices per player']
+
 
     f.close()
-    return configSettings
+    return configSettings, PlayerInfo
 
 playerChoices = []
 players = []
 
 
 if __name__ == '__main__':
-    filename = datetime.today().strftime('%Y%m%d%H%M%S')
-    os.system(
-        'cmd /c "java -jar gamut.jar -g RandomGame -normalize {0} -f games/{1}.game"'.format(loadJsonFile(), filename))
-    file = open("games/{0}.game".format(filename), "r")
+    wTotal = 0
+    wError = 0
+    wPlayerF = 0
+    wPlayerO = 0
+    for var in range(10):
+        filename = ""
+        time.sleep(1)
+        filename = datetime.today().strftime('%Y%m%d%H%M%S')
+        gameinfo, playerinfo = loadJsonFile()
+        os.system(
+            'cmd /c "java -jar gamut.jar -g RandomGame -normalize {0} -f games/{1}.game"'.format(gameinfo, filename))
+        file = open("games/{0}.game".format(filename), "r")
 
-    Values, Positions = ConvertFileToArray(file)
+        Values, Positions = ConvertFileToArray(file)
 
-    setAnarchyValue(Values, Positions)
-    players = createPlayers(playerChoices, Values, IBR)
+        setAnarchyValue(Values, Positions)
+        players = createPlayers(playerChoices, Values, playerinfo)
 
-    #choose a random choice for each player
-    currentChoice = []
-    for player in players:
-        currentChoice.append(player.chooseStartingPoint())
+        #choose a random choice for each player
+        currentChoice = []
+        for player in players:
+            currentChoice.append(player.chooseStartingPoint())
 
 
-    print(currentChoice)
+        print(currentChoice)
 
-    for step in range(5):
-        currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
+        for step in range(1000):
+            currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
 
-    f = open("outcome/{0}.txt".format(filename), "x")
-    f = open("outcome/{0}.txt".format(filename), "a")
-    playersum = 0
-    for player in players:
-        playersum += player.currentOutcome
-        print(player.behaviorToString())
-        f.write(player.behaviorToString())
-    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
-    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
-    print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
-    f.write("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+        f = open("outcome/{0}.txt".format(filename), "x")
+        f = open("outcome/{0}.txt".format(filename), "a")
+        playersum = 0
+        for player in players:
+            playersum += player.currentOutcome
+            print(player.behaviorToString())
+            f.write(player.behaviorToString())
+        f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
+        print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
+        print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+        f.write("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
 
-    originalsum = playersum
 
-    #todo
-    #normalize all the rezults in relation to the final choice
-    #re itterate
+        originalsum = playersum
 
-    #normalize
+        #todo
+        #normalize all the rezults in relation to the final choice
+        #re itterate
 
-    baseline = Values[getAbosolutePosition(currentChoice, playerChoices)]
+        #normalize
 
-    temp = []
-    for x in baseline:
-        temp.append(int(x)/playersum)
+        Values = normalize(Values, playersum, currentChoice, playerChoices, players)
 
-    baseline = temp
+        #step 5... whatever its called
 
-    newValues = []
-    for x in Values:
-        linesum = 0
-        for i in x:
-            linesum += int(i)
-        temp = []
-        for y,z in enumerate(x):
-            temp.append(linesum * baseline[y])
+        #this part could have more efficient code but it works for now
+        #to change, itterate through the positions and get the array index of the wanted position instead of cycling
+        # through the non necessary ones
+        #k-implementation
+        finalChoice = random.choice(anarchyValuePos)
+        for count, position in enumerate(Positions):
+            #print("position")
+            #(position)
+            if(position != finalChoice):
+                for x in range(len(position)):
+                    if(position[x] == finalChoice[x]):
+                        Values[count][x] += 99999
 
-        newValues.append(temp)
 
-    Values = newValues
-    for player in players:
-        player.updateValues(Values)
 
-    #reiterate
-    currentChoice = []
-    for player in players:
-        currentChoice.append(player.chooseStartingPoint())
+        #reiterate
+        currentChoice = []
+        for player in players:
+            currentChoice.append(player.chooseStartingPoint())
 
-    for step in range(10):
-        currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
+        for step in range(10):
+            currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
 
-    f.write("\n\nonce normalization is done : \n")
-    playersum = 0
-    for player in players:
-        playersum += player.currentOutcome
-        print(player.behaviorToString())
-        f.write(player.behaviorToString())
-    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
-    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
-    print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
-    f.write("Following choices will give the Anarchy value : {0}\n".format(anarchyValuePos))
-    print("changes from {0} to {1}".format(originalsum, playersum))
-    f.write("changes from {0} to {1}\n".format(originalsum, playersum))
+        f.write("\n\nonce normalization is done : \n")
+        playersum = 0
+        for player in players:
+            playersum += player.currentOutcome
+            print(player.behaviorToString())
+            f.write(player.behaviorToString())
+        f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
+        print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
+        print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+        f.write("Following choices will give the Anarchy value : {0}\n".format(anarchyValuePos))
+        print("changes from {0} to {1}".format(originalsum, playersum))
+        f.write("changes from {0} to {1}\n".format(originalsum, playersum))
+
+        if(playersum >= anarchyValue+1):
+            wError +=1
+        else:
+            wTotal += anarchyValue
+            wPlayerO += originalsum
+            wPlayerF += playersum
+
+        f.close
+        f = open("debug/{0}.txt".format(filename), "x")
+        f = open("debug/{0}.txt".format(filename), "a")
+
+        for x in Values:
+            f.write("[")
+            for y in x:
+                f.write(str(y))
+                f.write(", ")
+            f.write("]\n")
+
+        for player in players:
+            del player
+
+    print("total max")
+    print(wTotal)
+    print("total player original")
+    print(wPlayerO)
+    print("total player final")
+    print(wPlayerF)
+    print("error count : ")
+    print(wError)

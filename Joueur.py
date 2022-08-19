@@ -5,10 +5,10 @@ from FirstChoice import *
 
 class Joueur():
 
-    def __init__(self, playerNumber, numberOfChoices, values, iterationMethod, startMethod):
+    def __init__(self, playerNumber, numberOfChoices, infoDict, iterationMethod, startMethod):
         self.playerNumber = playerNumber
         self.numberOfChoices = numberOfChoices
-        self.Values = values
+        self.infoDict = infoDict
         self.currentOutcome = 0
         self.iterationMethod = iterationMethod
         self.maxOutcome = 0
@@ -18,12 +18,12 @@ class Joueur():
         self.startMethod = startMethod
 
     def chooseStartingPoint(self):
-        self.startPosition = self.startMethod(self.numberOfChoices, self.Values, self.playerNumber)
+        self.startPosition = self.startMethod("a",self.infoDict)
         return self.startPosition
 
     #overriding abstract mrthod
     def getNextChoice(self, arrayCurrentChoice):
-        self.currentChoice = self.iterationMethod(self.playerNumber, self.numberOfChoices, arrayCurrentChoice, self.Values)
+        self.currentChoice = self.iterationMethod(arrayCurrentChoice, self.infoDict)
         return self.currentChoice
 
 

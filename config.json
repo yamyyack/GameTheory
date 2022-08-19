@@ -1,7 +1,21 @@
 {
-	"number of choices per player":[3,3,3], 
-	"min payoff":0, 
-	"max payoff":10,
-	"int payoff":true,
-	"int payoff multiplier" : 1
+	"game info" : {
+		"number of choices per player":[3,3],
+		"min payoff":1, 
+		"max payoff":10,
+		"int payoff":true,
+		"int payoff multiplier" : 1
+	}, 
+	"player info" : [
+		{
+			"player number" : 1,
+			"starting method" : "MAB",
+			"iteration method" : "MAB"
+		},
+		{
+			"player number" : 2,
+			"starting method" : "MAB",
+			"iteration method" : "MAB"
+		}
+	]
 }

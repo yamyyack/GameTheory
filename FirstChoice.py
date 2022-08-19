@@ -1,11 +1,14 @@
 from Utils import getAbosolutePosition
 
 
-def minmax(playerChoices, Values, currentPlayer):
+def minmax(infoDict):
+    currentPlayer = infoDict["player number"]
+    playerChoices = infoDict["number of choices"]
+    print(currentPlayer)
     currentPlayer -= 1
     randarray = [9999999999]*(playerChoices[currentPlayer])
     for x in range(playerChoices[currentPlayer]):
-        kek = getAllPayoffForPlay(Values, currentPlayer, playerChoices, x+1)
+        kek = getAllPayoffForPlay(infoDict["tableValue"], currentPlayer, playerChoices, x+1)
         for y in kek:
             if((y[currentPlayer]) < (randarray[x])):
                 randarray[x] = y[currentPlayer]
