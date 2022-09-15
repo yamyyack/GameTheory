@@ -2,7 +2,7 @@
 import math
 
 
-def MAB(a, dict):
+def MAB(a,dict):
     max_upper_bound = 0
     for i in range(dict["number of choices"]):
         #selection process (which one to take)

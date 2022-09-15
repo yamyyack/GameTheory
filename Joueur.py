@@ -18,7 +18,7 @@ class Joueur():
         self.startMethod = startMethod
 
     def chooseStartingPoint(self):
-        self.startPosition = self.startMethod("a",self.infoDict)
+        self.startPosition = self.startMethod("a", self.infoDict)
         return self.startPosition
 
     #overriding abstract mrthod

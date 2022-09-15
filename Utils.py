@@ -48,3 +48,17 @@ def normalize(Values, playersum, currentChoice, playerChoices, players):
     for player in players:
         player.updateValues(Values)
     return Values
+
+
+# this part could have more efficient code but it works for now
+# to change, itterate through the positions and get the array index of the wanted position instead of cycling
+# through the non necessary ones
+def K_implementaion(anarchyValuePos, Positions, Values):
+    finalChoice = random.choice(anarchyValuePos)
+    for count, position in enumerate(Positions):
+        if (position != finalChoice):
+            for x in range(len(position)):
+                if (position[x] == finalChoice[x]):
+                    Values[count][x] += 99999
+
+

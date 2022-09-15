@@ -14,6 +14,26 @@ from MAB import *
 anarchyValue = 0
 anarchyValuePos = []
 
+def selectionProcess(players, Values, playerChoices, anarchyValue, anarchyValuePos, f):
+    currentChoice = []
+    for player in players:
+        currentChoice.append(player.chooseStartingPoint())
+
+    for step in range(1000):
+        currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
+
+    f.write("\n\nonce normalization is done : \n")
+    playersum = 0
+    for player in players:
+        playersum += player.currentOutcome
+        print(player.behaviorToString())
+        f.write(player.behaviorToString())
+    f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
+    print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
+    print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
+    f.write("Following choices will give the Anarchy value : {0}\n".format(anarchyValuePos))
+    return playersum, currentChoice
+
 def setAnarchyValue(Values, Positions):
     global anarchyValue
     global anarchyValuePos
@@ -162,75 +182,25 @@ if __name__ == '__main__':
         setAnarchyValue(Values, Positions)
         players = createPlayers(playerChoices, Values, playerinfo)
 
-        #choose a random choice for each player
-        currentChoice = []
-        for player in players:
-            currentChoice.append(player.chooseStartingPoint())
-
-
-        print(currentChoice)
-
-        for step in range(1000):
-            currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
-
         f = open("outcome/{0}.txt".format(filename), "x")
         f = open("outcome/{0}.txt".format(filename), "a")
-        playersum = 0
-        for player in players:
-            playersum += player.currentOutcome
-            print(player.behaviorToString())
-            f.write(player.behaviorToString())
-        f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
-        print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
-        print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
-        f.write("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
 
+        #choose a random choice for each player
+        playersum, currentChoice = selectionProcess(players, Values, playerChoices, anarchyValue, anarchyValuePos, f)
 
         originalsum = playersum
 
-        #todo
-        #normalize all the rezults in relation to the final choice
-        #re itterate
-
         #normalize
+        #Values = normalize(Values, playersum, currentChoice, playerChoices, players)
 
-        Values = normalize(Values, playersum, currentChoice, playerChoices, players)
-
-        #step 5... whatever its called
-
-        #this part could have more efficient code but it works for now
-        #to change, itterate through the positions and get the array index of the wanted position instead of cycling
-        # through the non necessary ones
         #k-implementation
-        finalChoice = random.choice(anarchyValuePos)
-        for count, position in enumerate(Positions):
-            #print("position")
-            #(position)
-            if(position != finalChoice):
-                for x in range(len(position)):
-                    if(position[x] == finalChoice[x]):
-                        Values[count][x] += 99999
-
-
+        #K_implementaion(anarchyValuePos, Positions, Values)
 
         #reiterate
-        currentChoice = []
-        for player in players:
-            currentChoice.append(player.chooseStartingPoint())
+        #playersum, currentChoice = selectionProcess(players, Values, playerChoices, anarchyValue, anarchyValuePos, f)
 
-        for step in range(10):
-            currentChoice = iteration(players, currentChoice, Values, playerChoices, step)
 
-        f.write("\n\nonce normalization is done : \n")
-        playersum = 0
-        for player in players:
-            playersum += player.currentOutcome
-            print(player.behaviorToString())
-            f.write(player.behaviorToString())
-        f.write("Anarchy value : {0}/{1}\n".format(str(playersum), str(anarchyValue)))
-        print("Anarchy value : {0}/{1}".format(str(playersum), str(anarchyValue)))
-        print("Following choices will give the Anarchy value : {0}".format(anarchyValuePos))
-        f.write("Following choices will give the Anarchy value : {0}\n".format(anarchyValuePos))
+        #final
         print("changes from {0} to {1}".format(originalsum, playersum))
         f.write("changes from {0} to {1}\n".format(originalsum, playersum))
 
